@@ -4,9 +4,13 @@ import { supabase } from '../supabase.js'
  
 function getStyle(status) {
   if (!status) return { bg: '', text: 'text-gray-300', border: '' }
-  if (status.includes('Campeão'))      return { bg: 'bg-yellow-400/20', text: 'text-yellow-300', border: 'border-l-4 border-yellow-400' }
-  if (status.includes('Acesso'))       return { bg: 'bg-green-400/10',  text: 'text-green-300',  border: 'border-l-4 border-green-500' }
-  if (status.includes('Rebaixamento')) return { bg: 'bg-red-400/10',    text: 'text-red-300',    border: 'border-l-4 border-red-500'   }
+  if (status.includes('Campeão'))           return { bg: 'bg-yellow-400/20', text: 'text-yellow-300', border: 'border-l-4 border-yellow-400' }
+  if (status.includes('Acesso Direto'))     return { bg: 'bg-green-400/10',  text: 'text-green-300',  border: 'border-l-4 border-green-500' }
+  if (status.includes('Play-offs'))         return { bg: 'bg-blue-400/10',   text: 'text-blue-300',   border: 'border-l-4 border-blue-500'  }
+  if (status.includes('Libertadores'))      return { bg: 'bg-green-400/10',  text: 'text-green-300',  border: 'border-l-4 border-green-500' }
+  if (status.includes('Pré-Libertadores'))  return { bg: 'bg-yellow-400/10', text: 'text-yellow-200', border: 'border-l-4 border-yellow-500' }
+  if (status.includes('Sul-Americana'))     return { bg: 'bg-blue-400/10',   text: 'text-blue-300',   border: 'border-l-4 border-blue-500'  }
+  if (status.includes('Rebaixamento'))      return { bg: 'bg-red-400/10',    text: 'text-red-300',    border: 'border-l-4 border-red-500'   }
   return { bg: '', text: 'text-gray-300', border: '' }
 }
  
@@ -57,6 +61,7 @@ export default function Serie({ serie }) {
   }, [rodadaSel, serie])
  
   const accentBorder = serie === 'A' ? 'border-green-500' : 'border-yellow-500'
+  const isB = serie === 'B'
  
   return (
     <div className="min-h-screen px-4 py-8 max-w-5xl mx-auto">
@@ -136,11 +141,12 @@ export default function Serie({ serie }) {
                       </thead>
                       <tbody>
                         {oficial.map((row) => {
-                          const isChamp  = row.pos === 1
-                          const isAccess = row.pos >= 2 && row.pos <= 4
-                          const isRel    = row.pos >= 17
-                          const rowBg      = isChamp ? 'bg-yellow-400/5' : isAccess ? 'bg-green-400/5' : isRel ? 'bg-red-400/5' : ''
-                          const leftBorder = isChamp ? 'border-l-4 border-yellow-400' : isAccess ? 'border-l-4 border-green-500' : isRel ? 'border-l-4 border-red-500' : 'border-l-4 border-transparent'
+                          const isChamp   = row.pos === 1
+                          const isAccess  = isB ? row.pos === 2 : (row.pos >= 2 && row.pos <= 4)
+                          const isPlayoff = isB && row.pos >= 3 && row.pos <= 6
+                          const isRel     = row.pos >= 17
+                          const rowBg      = isChamp ? 'bg-yellow-400/5' : isAccess ? 'bg-green-400/5' : isPlayoff ? 'bg-blue-400/5' : isRel ? 'bg-red-400/5' : ''
+                          const leftBorder = isChamp ? 'border-l-4 border-yellow-400' : isAccess ? 'border-l-4 border-green-500' : isPlayoff ? 'border-l-4 border-blue-500' : isRel ? 'border-l-4 border-red-500' : 'border-l-4 border-transparent'
                           return (
                             <tr key={row.time} className={`border-t border-gray-800 ${rowBg} ${leftBorder}`}>
                               <td className="px-4 py-3 text-gray-400 font-mono">{row.pos}</td>
@@ -161,6 +167,17 @@ export default function Serie({ serie }) {
                       </tbody>
                     </table>
                   </div>
+                  <div className="px-6 py-3 border-t border-gray-800 flex flex-wrap gap-4 text-xs text-gray-400">
+                    <span><span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1"></span>Campeão</span>
+                    {isB ? <>
+                      <span><span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span>Acesso direto (2º)</span>
+                      <span><span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>Play-offs (3º–6º)</span>
+                    </> : <>
+                      <span><span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span>Libertadores (2º–4º)</span>
+                      <span><span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>Sul-Americana (6º–12º)</span>
+                    </>}
+                    <span><span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span>Rebaixamento (17º–20º)</span>
+                  </div>
                 </div>
               )}
  
@@ -180,7 +197,8 @@ export default function Serie({ serie }) {
                           <th className="px-4 py-3 text-center">Pts Proj.</th>
                           <th className="px-4 py-3 text-center">Status</th>
                           <th className="px-4 py-3 text-center">% Título</th>
-                          <th className="px-4 py-3 text-center">% Acesso</th>
+                          <th className="px-4 py-3 text-center">{isB ? '% Acesso' : '% Libert.'}</th>
+                          {isB && <th className="px-4 py-3 text-center">% Play-offs</th>}
                           <th className="px-4 py-3 text-center">% Queda</th>
                         </tr>
                       </thead>
@@ -196,6 +214,7 @@ export default function Serie({ serie }) {
                               <td className="px-4 py-3 text-center text-xs">{row.status}</td>
                               <td className="px-4 py-3 text-center text-yellow-300">{pct(row.p_campeao)}</td>
                               <td className="px-4 py-3 text-center text-green-300">{pct(row.p_acesso)}</td>
+                              {isB && <td className="px-4 py-3 text-center text-blue-300">{pct(row.p_playoffs)}</td>}
                               <td className="px-4 py-3 text-center text-red-300">{pct(row.p_rebaixamento)}</td>
                             </tr>
                           )
