@@ -143,10 +143,12 @@ export default function Serie({ serie }) {
                         {oficial.map((row) => {
                           const isChamp   = row.pos === 1
                           const isAccess  = isB ? row.pos === 2 : (row.pos >= 2 && row.pos <= 4)
+                          const isPreLib  = !isB && row.pos === 5
+                          const isSulAm   = !isB && row.pos >= 6 && row.pos <= 12
                           const isPlayoff = isB && row.pos >= 3 && row.pos <= 6
                           const isRel     = row.pos >= 17
-                          const rowBg      = isChamp ? 'bg-yellow-400/5' : isAccess ? 'bg-green-400/5' : isPlayoff ? 'bg-blue-400/5' : isRel ? 'bg-red-400/5' : ''
-                          const leftBorder = isChamp ? 'border-l-4 border-yellow-400' : isAccess ? 'border-l-4 border-green-500' : isPlayoff ? 'border-l-4 border-blue-500' : isRel ? 'border-l-4 border-red-500' : 'border-l-4 border-transparent'
+                          const rowBg      = isChamp ? 'bg-yellow-400/5' : isAccess ? 'bg-green-400/5' : isPreLib ? 'bg-yellow-400/5' : isSulAm ? 'bg-blue-400/5' : isPlayoff ? 'bg-blue-400/5' : isRel ? 'bg-red-400/5' : ''
+                          const leftBorder = isChamp ? 'border-l-4 border-yellow-400' : isAccess ? 'border-l-4 border-green-500' : isPreLib ? 'border-l-4 border-yellow-500' : isSulAm ? 'border-l-4 border-blue-500' : isPlayoff ? 'border-l-4 border-blue-500' : isRel ? 'border-l-4 border-red-500' : 'border-l-4 border-transparent'
                           return (
                             <tr key={row.time} className={`border-t border-gray-800 ${rowBg} ${leftBorder}`}>
                               <td className="px-4 py-3 text-gray-400 font-mono">{row.pos}</td>
@@ -174,6 +176,7 @@ export default function Serie({ serie }) {
                       <span><span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>Play-offs (3º–6º)</span>
                     </> : <>
                       <span><span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span>Libertadores (2º–4º)</span>
+                      <span><span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>Pré-Libertadores (5º)</span>
                       <span><span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>Sul-Americana (6º–12º)</span>
                     </>}
                     <span><span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span>Rebaixamento (17º–20º)</span>
